@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "750857744363",
+    "project_id": "bacootrip",
+    "storage_bucket": "bacootrip.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750857744363:android:dc9c192aab9778f68bf3ae",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750857744363-kim45ppsbficmlfeavkgcj0hpekogsmq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.untitled",
+            "certificate_hash": "5a0615ac8bb84f4b7626d475b5d721db3e61cd7f"
+          }
+        },
+        {
+          "client_id": "750857744363-q6rg63jvc2g5ibo5t2j7qn59ansnru8i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS7q1o2cxggV9a3E1SOs3-vLU6NJmAzXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750857744363-q6rg63jvc2g5ibo5t2j7qn59ansnru8i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750857744363-396lqvc41k64v4mi7mjhtoq0io2r6dnt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.untitled"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,30 @@
+// This file helps Flutter handle its plugins.
+// We'll create a modified version of the original Flutter file.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.2'
+    }
+}
+
+def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
+def plugins = new Properties()
+def pluginsFile = new File(flutterProjectRoot.toFile(), '.flutter-plugins')
+if (pluginsFile.exists()) {
+    pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
+}
+
+plugins.each { name, path ->
+    def pluginDirectory = flutterProjectRoot.resolve(path).toFile()
+    def pluginBuildGradle = new File(pluginDirectory, 'android/build.gradle')
+    if (pluginBuildGradle.exists()) {
+        // Instead of applying plugins imperatively, we'll include them as projects
+        def pluginProject = ":${name}"
+        include pluginProject
+        project(pluginProject).projectDir = new File(pluginDirectory, 'android')
+    }
+} 
