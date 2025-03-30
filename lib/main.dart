@@ -5,12 +5,12 @@ import 'package:untitled/providers/language_provider.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:untitled/providers/auth_provider.dart';
 import 'package:untitled/screens/LoginPage.dart';
-import 'package:untitled/l10n/app_localizations.dart';
 import 'package:untitled/screens/HomePage.dart';
 import 'package:untitled/components/StyleGuide.dart';
 import 'package:untitled/screens/camera_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:untitled/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,8 +32,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
-      child: Consumer2<ThemeProvider, LanguageProvider>(
-        builder: (context, themeProvider, languageProvider, child) {
+      child: Consumer3<ThemeProvider, LanguageProvider, AuthProvider>(
+        builder: (context, themeProvider, languageProvider, authProvider, child) {
           return MaterialApp(
             title: 'Travel App',
             theme: ThemeData(
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
               Locale('en'),
               Locale('es'),
             ],
-            home: const LoginPage(),
+            home: authProvider.user != null ? const HomePage() : const LoginPage(),
           );
         },
       ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
+import 'package:untitled/providers/auth_provider.dart' as app_auth;
 import 'package:untitled/screens/LoginPage.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth hide AuthProvider;
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -22,7 +22,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showEditProfileDialog(BuildContext context) {
-    final user = context.read<AuthProvider>().user;
+    final user = context.read<app_auth.AuthProvider>().user;
     final usernameController = TextEditingController();
     
     // Get current username
@@ -133,13 +133,14 @@ class ProfilePage extends StatelessWidget {
               }
 
               try {
-                final user = context.read<AuthProvider>().user;
+                final user = context.read<app_auth.AuthProvider>().user;
                 if (user != null) {
                   // Reauthenticate user
-                  final credential = EmailAuthProvider.credential(
+                  final credential = firebase_auth.EmailAuthProvider.credential(
                     email: user.email!,
                     password: currentPasswordController.text,
                   );
+
                   await user.reauthenticateWithCredential(credential);
                   
                   // Update password
@@ -302,7 +303,8 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final user = context.watch<app_auth.AuthProvider>().user;
+
 
     return Scaffold(
       appBar: AppBar(
@@ -477,7 +479,7 @@ class ProfilePage extends StatelessWidget {
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context); // Close dialog
-                                  context.read<AuthProvider>().signOut();
+                                  context.read<app_auth.AuthProvider>().signOut();
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(builder: (context) => const LoginPage()),
