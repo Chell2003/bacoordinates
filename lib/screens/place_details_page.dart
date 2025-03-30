@@ -79,72 +79,84 @@ class PlaceDetailsPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _customButton(
-          context,
-          icon: Icons.schedule,
-          iconColor: Colors.white,
-          label: 'View Itinerary',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ItineraryPage(placeId: placeId),
-              ),
-            );
-          },
-        ),
-        _customButton(
-          context,
-          icon: Icons.auto_awesome,
-          iconColor: Colors.white,
-          label: 'Generate Itinerary',
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance.collection('places').doc(placeId).snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final place = snapshot.data!.data() as Map<String, dynamic>;
-                  return ItineraryGenerated(
-                    placeId: placeId,
-                    placeTitle: place['title'] ?? '',
-                    placeDescription: place['description'] ?? '',
-                  );
-                },
-              ),
-            );
-          },
-        ),
-        _customButton(
-          context,
-          icon: Icons.explore,
-          iconColor: Colors.white,
-          label: 'Explore',
-          onPressed: () {
-            // Navigate to map
-          },
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        alignment: WrapAlignment.spaceEvenly,
+        children: [
+          _customButton(
+            context,
+            icon: Icons.schedule,
+            iconColor: Colors.white,
+            label: 'View Itinerary',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ItineraryPage(placeId: placeId),
+                ),
+              );
+            },
+          ),
+          _customButton(
+            context,
+            icon: Icons.auto_awesome,
+            iconColor: Colors.white,
+            label: 'Generate',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('places').doc(placeId).snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final place = snapshot.data!.data() as Map<String, dynamic>;
+                    return ItineraryGenerated(
+                      placeId: placeId,
+                      placeTitle: place['title'] ?? '',
+                      placeDescription: place['description'] ?? '',
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          _customButton(
+            context,
+            icon: Icons.explore,
+            iconColor: Colors.white,
+            label: 'Explore',
+            onPressed: () {
+              // Navigate to map
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget _customButton(BuildContext context, {required IconData icon, required Color iconColor, required String label, required VoidCallback onPressed}) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: context.watch<ThemeProvider>().isDarkMode ? const Color(0xFF3D3F4B) : null,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return SizedBox(
+      width: 120,
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: context.watch<ThemeProvider>().isDarkMode ? const Color(0xFF3D3F4B) : null,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        icon: Icon(icon, color: iconColor, size: 20),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+          textAlign: TextAlign.center,
+        ),
+        onPressed: onPressed,
       ),
-      icon: Icon(icon, color: iconColor), // Apply Icon Color
-      label: Text(label),
-      onPressed: onPressed,
     );
   }
 

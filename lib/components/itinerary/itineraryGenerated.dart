@@ -42,6 +42,7 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -59,12 +60,14 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                 children: [
                   const Icon(Icons.auto_awesome, color: Colors.white),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Generate Custom Itinerary',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      'Generate Custom Itinerary',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -85,6 +88,7 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         prefixIcon: const Icon(Icons.title),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -105,10 +109,11 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
                               children: [
                                 const Text('Duration: '),
-                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
@@ -133,14 +138,17 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                                     },
                                   ),
                                 ),
-                                const Spacer(),
                                 ElevatedButton.icon(
                                   onPressed: _pickDate,
                                   icon: const Icon(Icons.calendar_today),
-                                  label: Text(_selectedDate == null 
-                                    ? 'Select Date' 
-                                    : 'Start: ${_selectedDate!.toLocal()}'.split(' ')[0]),
+                                  label: Text(
+                                    _selectedDate == null 
+                                      ? 'Select Date' 
+                                      : 'Start: ${_selectedDate!.toLocal()}'.split(' ')[0],
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                   style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -175,7 +183,10 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                               runSpacing: 8,
                               children: _availableActivities.map((activity) {
                                 return FilterChip(
-                                  label: Text(activity),
+                                  label: Text(
+                                    activity,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                   selected: _selectedActivities.contains(activity),
                                   onSelected: (bool selected) {
                                     setState(() {
@@ -219,7 +230,7 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _generateItinerary,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -230,7 +241,7 @@ class _ItineraryGeneratedState extends State<ItineraryGenerated> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Generate Itinerary'),
+                        : const Text('Generate'),
                   ),
                 ],
               ),
