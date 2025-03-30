@@ -4,6 +4,7 @@ import 'package:untitled/providers/auth_provider.dart';
 import 'package:untitled/screens/LoginPage.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -18,6 +19,285 @@ class ProfilePage extends StatelessWidget {
     } catch (e) {
       return null;
     }
+  }
+
+  void _showEditProfileDialog(BuildContext context) {
+    final user = context.read<AuthProvider>().user;
+    final usernameController = TextEditingController();
+    
+    // Get current username
+    _getUserName(user!.uid).then((username) {
+      if (username != null) {
+        usernameController.text = username;
+      }
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Profile'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Bio',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+                'username': usernameController.text,
+                'updatedAt': FieldValue.serverTimestamp(),
+              });
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: currentPasswordController,
+              decoration: const InputDecoration(
+                labelText: 'Current Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: newPasswordController,
+              decoration: const InputDecoration(
+                labelText: 'New Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: confirmPasswordController,
+              decoration: const InputDecoration(
+                labelText: 'Confirm New Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (newPasswordController.text != confirmPasswordController.text) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('New passwords do not match')),
+                );
+                return;
+              }
+
+              try {
+                final user = context.read<AuthProvider>().user;
+                if (user != null) {
+                  // Reauthenticate user
+                  final credential = EmailAuthProvider.credential(
+                    email: user.email!,
+                    password: currentPasswordController.text,
+                  );
+                  await user.reauthenticateWithCredential(credential);
+                  
+                  // Update password
+                  await user.updatePassword(newPasswordController.text);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${e.toString()}')),
+                  );
+                }
+              }
+            },
+            child: const Text('Change Password'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNotificationSettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Notification Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile(
+              title: const Text('Push Notifications'),
+              value: true, // Replace with actual state
+              onChanged: (value) {
+                // Implement notification toggle
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Email Notifications'),
+              value: true, // Replace with actual state
+              onChanged: (value) {
+                // Implement email notification toggle
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrivacySettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Privacy Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile(
+              title: const Text('Profile Visibility'),
+              subtitle: const Text('Make your profile visible to other users'),
+              value: true, // Replace with actual state
+              onChanged: (value) {
+                // Implement privacy toggle
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Activity Status'),
+              subtitle: const Text('Show when you\'re active'),
+              value: true, // Replace with actual state
+              onChanged: (value) {
+                // Implement activity status toggle
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageSettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Language Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('English'),
+              onTap: () {
+                // Implement language change
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Spanish'),
+              onTap: () {
+                // Implement language change
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('French'),
+              onTap: () {
+                // Implement language change
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About App'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Version: 1.0.0'),
+            SizedBox(height: 8),
+            Text('Your travel companion app for creating and managing itineraries.'),
+            SizedBox(height: 8),
+            Text('© 2024 All rights reserved.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -132,33 +412,25 @@ class ProfilePage extends StatelessWidget {
                     context,
                     'Edit Profile',
                     Icons.edit,
-                    () {
-                      // Navigate to edit profile
-                    },
+                    () => _showEditProfileDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Change Password',
                     Icons.lock,
-                    () {
-                      // Navigate to change password
-                    },
+                    () => _showChangePasswordDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Notifications',
                     Icons.notifications,
-                    () {
-                      // Navigate to notifications settings
-                    },
+                    () => _showNotificationSettings(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Privacy',
                     Icons.privacy_tip,
-                    () {
-                      // Navigate to privacy settings
-                    },
+                    () => _showPrivacySettings(context),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -173,25 +445,19 @@ class ProfilePage extends StatelessWidget {
                     context,
                     'Language',
                     Icons.language,
-                    () {
-                      // Navigate to language settings
-                    },
+                    () => _showLanguageSettings(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Theme',
                     Icons.palette,
-                    () {
-                      _showThemeDialog(context);
-                    },
+                    () => _showThemeDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'About',
                     Icons.info,
-                    () {
-                      // Navigate to about page
-                    },
+                    () => _showAboutDialog(context),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
