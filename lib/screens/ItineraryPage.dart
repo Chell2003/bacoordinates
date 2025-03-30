@@ -18,14 +18,11 @@ class _ItineraryPageState extends State<ItineraryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Itinerary'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showAddItineraryDialog,
-          ),
-        ],
+      appBar: AppBar(title: const Text('Itinerary')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddItineraryDialog,
+        icon: const Icon(Icons.add),
+        label: const Text('Add Itinerary'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -49,60 +46,17 @@ class _ItineraryPageState extends State<ItineraryPage> {
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: ExpansionTile(
-                  title: Text(
-                    itinerary['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                child: ListTile(
+                  title: Text(itinerary['title'], style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(
-                    'Date: ${itinerary['date'].split('T')[0]}',
+                    '${itinerary['description']}\nDate: ${itinerary['date']}',
                     style: const TextStyle(color: Colors.grey),
                   ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (itinerary['activities'] != null) ...[
-                            const Text(
-                              'Selected Activities:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: (itinerary['activities'] as List<dynamic>)
-                                  .map((activity) => Chip(
-                                        label: Text(activity),
-                                        backgroundColor: Colors.blue[100],
-                                      ))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
-                          const Text(
-                            'Schedule:',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            itinerary['description'],
-                            style: const TextStyle(color: Colors.black87),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ButtonBar(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _deleteItinerary(doc.id),
-                        ),
-                      ],
-                    ),
-                  ],
+                  isThreeLine: true,
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _deleteItinerary(doc.id),
+                  ),
                 ),
               );
             }).toList(),

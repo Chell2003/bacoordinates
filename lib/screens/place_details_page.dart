@@ -5,8 +5,6 @@ import 'package:shimmer/shimmer.dart';
 
 import '../providers/theme_provider.dart';
 import 'ItineraryPage.dart';
-import '../components/itinerary/itineraryCustom.dart';
-import '../components/itinerary/itineraryGenerated.dart';
 
 class PlaceDetailsPage extends StatelessWidget {
   final String placeId;
@@ -86,8 +84,8 @@ class PlaceDetailsPage extends StatelessWidget {
         _customButton(
           context,
           icon: Icons.schedule,
-          iconColor: Colors.white,
-          label: 'View Itinerary',
+          iconColor: Colors.white, // Itinerary Icon Color
+          label: 'Itinerary',
           onPressed: () {
             Navigator.push(
               context,
@@ -99,33 +97,8 @@ class PlaceDetailsPage extends StatelessWidget {
         ),
         _customButton(
           context,
-          icon: Icons.auto_awesome,
-          iconColor: Colors.white,
-          label: 'Generate Itinerary',
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance.collection('places').doc(placeId).snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final place = snapshot.data!.data() as Map<String, dynamic>;
-                  return ItineraryGenerated(
-                    placeId: placeId,
-                    placeTitle: place['title'] ?? '',
-                    placeDescription: place['description'] ?? '',
-                  );
-                },
-              ),
-            );
-          },
-        ),
-        _customButton(
-          context,
           icon: Icons.explore,
-          iconColor: Colors.white,
+          iconColor: Colors.white, // Explore Icon Color
           label: 'Explore',
           onPressed: () {
             // Navigate to map
