@@ -42,32 +42,43 @@ class _ItineraryPageState extends State<ItineraryPage> {
             return _buildEmptyState();
           }
 
-          return ListView(
+          return ListView.builder(
             padding: const EdgeInsets.all(16),
-            children: snapshot.data!.docs.map((doc) {
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var doc = snapshot.data!.docs[index];
               var itinerary = doc.data() as Map<String, dynamic>;
               return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                margin: const EdgeInsets.only(bottom: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: ExpansionTile(
                   title: Text(
                     itinerary['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   subtitle: Text(
                     'Date: ${itinerary['date'].split('T')[0]}',
-                    style: const TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
                   ),
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                    Container(
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (itinerary['activities'] != null) ...[
                             const Text(
                               'Selected Activities:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -75,8 +86,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
                               runSpacing: 8,
                               children: (itinerary['activities'] as List<dynamic>)
                                   .map((activity) => Chip(
-                                        label: Text(activity),
-                                        backgroundColor: Colors.blue[100],
+                                        label: Text(
+                                          activity,
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                        ),
                                       ))
                                   .toList(),
                             ),
@@ -84,28 +101,38 @@ class _ItineraryPageState extends State<ItineraryPage> {
                           ],
                           const Text(
                             'Schedule:',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             itinerary['description'],
-                            style: const TextStyle(color: Colors.black87),
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     ButtonBar(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                        TextButton.icon(
                           onPressed: () => _deleteItinerary(doc.id),
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
               );
-            }).toList(),
+            },
           );
         },
       ),
@@ -117,14 +144,30 @@ class _ItineraryPageState extends State<ItineraryPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.event_note, size: 80, color: Colors.grey),
+          Icon(
+            Icons.event_note,
+            size: 80,
+            color: Colors.grey[400],
+          ),
           const SizedBox(height: 16),
-          const Text('No itineraries added yet.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+          Text(
+            'No itineraries added yet.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _generateSampleItinerary,
             icon: const Icon(Icons.auto_awesome),
             label: const Text('Generate Sample Itinerary'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
           ),
         ],
       ),
@@ -135,30 +178,85 @@ class _ItineraryPageState extends State<ItineraryPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Itinerary'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: _titleController, decoration: const InputDecoration(labelText: 'Title')),
-              TextField(controller: _descriptionController, decoration: const InputDecoration(labelText: 'Description')),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Text(_selectedDate == null ? 'Select Date' : 'Date: ${_selectedDate!.toLocal()}'.split(' ')[0]),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: _pickDate,
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Add Itinerary',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.title),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.description),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Text(
+                      _selectedDate == null 
+                        ? 'Select Date' 
+                        : 'Date: ${_selectedDate!.toLocal()}'.split(' ')[0],
+                      style: TextStyle(
+                        color: _selectedDate == null ? Colors.grey : Colors.black,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: _pickDate,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _addItinerary,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-            ElevatedButton(onPressed: _addItinerary, child: const Text('Save')),
-          ],
         );
       },
     );
