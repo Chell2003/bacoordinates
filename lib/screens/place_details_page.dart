@@ -6,6 +6,7 @@ import 'package:shimmer/shimmer.dart';
 import '../providers/theme_provider.dart';
 import 'ItineraryPage.dart';
 import '../components/itinerary/itineraryCustom.dart';
+import '../components/itinerary/itineraryGenerated.dart';
 
 class PlaceDetailsPage extends StatelessWidget {
   final String placeId;
@@ -111,7 +112,7 @@ class PlaceDetailsPage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final place = snapshot.data!.data() as Map<String, dynamic>;
-                  return ItineraryCustom(
+                  return ItineraryGenerated(
                     placeId: placeId,
                     placeTitle: place['title'] ?? '',
                     placeDescription: place['description'] ?? '',
