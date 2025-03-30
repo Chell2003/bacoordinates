@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
+import 'package:untitled/providers/auth_provider.dart' as app_auth;
 import 'package:untitled/screens/LoginPage.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth hide AuthProvider;
+
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
 
   Future<String?> _getUserName(String uid) async {
     try {
@@ -21,16 +23,18 @@ class ProfilePage extends StatelessWidget {
     }
   }
 
+
   void _showEditProfileDialog(BuildContext context) {
-    final user = context.read<AuthProvider>().user;
+    final user = context.read<app_auth.AuthProvider>().user;
     final usernameController = TextEditingController();
-    
+
     // Get current username
     _getUserName(user!.uid).then((username) {
       if (username != null) {
         usernameController.text = username;
       }
     });
+
 
     showDialog(
       context: context,
@@ -47,8 +51,8 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Bio',
                 border: OutlineInputBorder(),
               ),
@@ -78,10 +82,12 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+
   void _showChangePasswordDialog(BuildContext context) {
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
+
 
     showDialog(
       context: context,
@@ -132,16 +138,17 @@ class ProfilePage extends StatelessWidget {
                 return;
               }
 
+
               try {
-                final user = context.read<AuthProvider>().user;
+                final user = context.read<app_auth.AuthProvider>().user;
                 if (user != null) {
                   // Reauthenticate user
-                  final credential = EmailAuthProvider.credential(
+                  final credential = firebase_auth.EmailAuthProvider.credential(
                     email: user.email!,
                     password: currentPasswordController.text,
                   );
                   await user.reauthenticateWithCredential(credential);
-                  
+
                   // Update password
                   await user.updatePassword(newPasswordController.text);
                   if (context.mounted) {
@@ -162,6 +169,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
 
   void _showNotificationSettings(BuildContext context) {
     showDialog(
@@ -196,6 +204,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
 
   void _showPrivacySettings(BuildContext context) {
     showDialog(
@@ -232,6 +241,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
 
   void _showLanguageSettings(BuildContext context) {
     showDialog(
@@ -274,6 +284,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -300,9 +311,11 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final user = context.watch<app_auth.AuthProvider>().user;
+
 
     return Scaffold(
       appBar: AppBar(
@@ -348,21 +361,21 @@ class ProfilePage extends StatelessWidget {
                         : null,
                     child: user?.photoURL == null && user != null
                         ? FutureBuilder<String?>(
-                            future: _getUserName(user.uid),
-                            builder: (context, snapshot) {
-                              final username = snapshot.data;
-                              return Text(
-                                username != null && username.isNotEmpty ? username[0].toUpperCase() : 'A',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: context.watch<ThemeProvider>().isDarkMode
-                                      ? Colors.white
-                                      : Colors.white,
-                                ),
-                              );
-                            },
-                          )
+                      future: _getUserName(user.uid),
+                      builder: (context, snapshot) {
+                        final username = snapshot.data;
+                        return Text(
+                          username != null && username.isNotEmpty ? username[0].toUpperCase() : 'A',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: context.watch<ThemeProvider>().isDarkMode
+                                ? Colors.white
+                                : Colors.white,
+                          ),
+                        );
+                      },
+                    )
                         : null,
                   ),
                   const SizedBox(height: 16),
@@ -412,25 +425,25 @@ class ProfilePage extends StatelessWidget {
                     context,
                     'Edit Profile',
                     Icons.edit,
-                    () => _showEditProfileDialog(context),
+                        () => _showEditProfileDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Change Password',
                     Icons.lock,
-                    () => _showChangePasswordDialog(context),
+                        () => _showChangePasswordDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Notifications',
                     Icons.notifications,
-                    () => _showNotificationSettings(context),
+                        () => _showNotificationSettings(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Privacy',
                     Icons.privacy_tip,
-                    () => _showPrivacySettings(context),
+                        () => _showPrivacySettings(context),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -445,19 +458,19 @@ class ProfilePage extends StatelessWidget {
                     context,
                     'Language',
                     Icons.language,
-                    () => _showLanguageSettings(context),
+                        () => _showLanguageSettings(context),
                   ),
                   _buildSettingCard(
                     context,
                     'Theme',
                     Icons.palette,
-                    () => _showThemeDialog(context),
+                        () => _showThemeDialog(context),
                   ),
                   _buildSettingCard(
                     context,
                     'About',
                     Icons.info,
-                    () => _showAboutDialog(context),
+                        () => _showAboutDialog(context),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -476,12 +489,12 @@ class ProfilePage extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pop(context); // Close dialog
-                                  context.read<AuthProvider>().signOut();
+                                  Navigator.pop(context);
+                                  context.read<app_auth.AuthProvider>().signOut();
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(builder: (context) => const LoginPage()),
-                                    (route) => false,
+                                        (route) => false,
                                   );
                                 },
                                 style: TextButton.styleFrom(
@@ -510,12 +523,13 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+
   Widget _buildSettingCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
+      BuildContext context,
+      String title,
+      IconData icon,
+      VoidCallback onTap,
+      ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -523,18 +537,19 @@ class ProfilePage extends StatelessWidget {
         title: Text(title),
         trailing: title == 'Theme'
             ? Switch(
-                value: context.watch<ThemeProvider>().isDarkMode,
-                onChanged: (value) {
-                  context.read<ThemeProvider>().toggleTheme();
-                },
-                activeColor: const Color(0xFFFFB300), // yellow[700]
-                activeTrackColor: const Color(0xFFFFB300).withOpacity(0.5),
-              )
+          value: context.watch<ThemeProvider>().isDarkMode,
+          onChanged: (value) {
+            context.read<ThemeProvider>().toggleTheme();
+          },
+          activeColor: const Color(0xFFFFB300), // yellow[700]
+          activeTrackColor: const Color(0xFFFFB300).withOpacity(0.5),
+        )
             : const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
     );
   }
+
 
   void _showThemeDialog(BuildContext context) {
     final isDarkMode = context.read<ThemeProvider>().isDarkMode;
@@ -581,3 +596,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+
+
+
