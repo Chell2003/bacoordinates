@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
+import 'package:untitled/providers/auth_provider.dart' as app_auth;
 import 'package:untitled/screens/LoginPage.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth hide AuthProvider;
+import 'package:untitled/providers/language_provider.dart';
+import 'package:untitled/localizations/app_localizations.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -22,7 +24,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showEditProfileDialog(BuildContext context) {
-    final user = context.read<AuthProvider>().user;
+    final user = context.read<app_auth.AuthProvider>().user;
     final usernameController = TextEditingController();
     
     // Get current username
@@ -47,8 +49,8 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Bio',
                 border: OutlineInputBorder(),
               ),
@@ -133,10 +135,10 @@ class ProfilePage extends StatelessWidget {
               }
 
               try {
-                final user = context.read<AuthProvider>().user;
+                final user = context.read<app_auth.AuthProvider>().user;
                 if (user != null) {
                   // Reauthenticate user
-                  final credential = EmailAuthProvider.credential(
+                  final credential = firebase_auth.EmailAuthProvider.credential(
                     email: user.email!,
                     password: currentPasswordController.text,
                   );
@@ -234,31 +236,31 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showLanguageSettings(BuildContext context) {
+    final languageProvider = context.read<LanguageProvider>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Language Settings'),
+        title: Text(AppLocalizations.of(context)!.languageSettings),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               title: const Text('English'),
+              leading: const Icon(Icons.language),
+              selected: languageProvider.currentLocale.languageCode == 'en',
+              selectedTileColor: Colors.blue.withOpacity(0.1),
               onTap: () {
-                // Implement language change
+                languageProvider.changeLanguage('en');
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Spanish'),
+              title: const Text('Español'),
+              leading: const Icon(Icons.language),
+              selected: languageProvider.currentLocale.languageCode == 'es',
+              selectedTileColor: Colors.blue.withOpacity(0.1),
               onTap: () {
-                // Implement language change
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('French'),
-              onTap: () {
-                // Implement language change
+                languageProvider.changeLanguage('es');
                 Navigator.pop(context);
               },
             ),
@@ -267,7 +269,7 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
         ],
       ),
@@ -302,7 +304,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final user = context.watch<app_auth.AuthProvider>().user;
 
     return Scaffold(
       appBar: AppBar(
@@ -476,8 +478,8 @@ class ProfilePage extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pop(context); // Close dialog
-                                  context.read<AuthProvider>().signOut();
+                                  Navigator.pop(context);
+                                  context.read<app_auth.AuthProvider>().signOut();
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(builder: (context) => const LoginPage()),

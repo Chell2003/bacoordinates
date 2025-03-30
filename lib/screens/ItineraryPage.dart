@@ -13,7 +13,20 @@ class ItineraryPage extends StatefulWidget {
 class _ItineraryPageState extends State<ItineraryPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _activityController = TextEditingController();
   DateTime? _selectedDate;
+  List<String> _activities = [];
+
+  final List<String> _availableActivities = [
+    'Morning Tour',
+    'Afternoon Exploration',
+    'Evening Activities',
+    'Local Food Experience',
+    'Cultural Activities',
+    'Shopping',
+    'Relaxation',
+    'Adventure Activities',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +85,25 @@ class _ItineraryPageState extends State<ItineraryPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (itinerary['activities'] != null) ...[
-                            const Text(
-                              'Selected Activities:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Activities:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
+                              TextButton.icon(
+                                onPressed: () => _showAddActivityDialog(doc.id),
+                                icon: const Icon(Icons.add),
+                                label: const Text('Add Activity'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          if (itinerary['activities'] != null) ...[
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
@@ -94,6 +117,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
                                         labelStyle: TextStyle(
                                           color: Theme.of(context).primaryColor,
                                         ),
+                                        onDeleted: () => _deleteActivity(doc.id, activity),
                                       ))
                                   .toList(),
                             ),
@@ -304,6 +328,119 @@ class _ItineraryPageState extends State<ItineraryPage> {
         .collection('itineraries')
         .doc(docId)
         .delete();
+  }
+
+  void _showAddActivityDialog(String itineraryId) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Add Activity',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _activityController,
+                decoration: InputDecoration(
+                  labelText: 'Activity Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.event),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Or select from common activities:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _availableActivities.map((activity) {
+                  return ActionChip(
+                    label: Text(activity),
+                    onPressed: () {
+                      _activityController.text = activity;
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_activityController.text.isNotEmpty) {
+                        _addActivity(itineraryId);
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Add'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addActivity(String itineraryId) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('places')
+        .doc(widget.placeId)
+        .collection('itineraries')
+        .doc(itineraryId);
+
+    final doc = await docRef.get();
+    final data = doc.data() as Map<String, dynamic>;
+    final activities = List<String>.from(data['activities'] ?? []);
+
+    if (!activities.contains(_activityController.text)) {
+      activities.add(_activityController.text);
+      await docRef.update({'activities': activities});
+    }
+
+    _activityController.clear();
+  }
+
+  Future<void> _deleteActivity(String itineraryId, String activity) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('places')
+        .doc(widget.placeId)
+        .collection('itineraries')
+        .doc(itineraryId);
+
+    final doc = await docRef.get();
+    final data = doc.data() as Map<String, dynamic>;
+    final activities = List<String>.from(data['activities'] ?? []);
+
+    activities.remove(activity);
+    await docRef.update({'activities': activities});
   }
 
   void _generateSampleItinerary() {
