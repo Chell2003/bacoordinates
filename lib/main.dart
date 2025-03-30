@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/forum_provider.dart';
+import 'package:untitled/providers/language_provider.dart';
 import 'package:untitled/providers/theme_provider.dart';
 import 'package:untitled/providers/auth_provider.dart';
+import 'package:untitled/screens/LoginPage.dart';
+import 'package:untitled/l10n/app_localizations.dart';
 import 'package:untitled/screens/HomePage.dart';
 import 'package:untitled/components/StyleGuide.dart';
 import 'package:untitled/screens/camera_screen.dart';
@@ -15,15 +18,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,24 +26,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    return MaterialApp(
-      title: 'BacoTrip',
-      debugShowCheckedModeBanner: false,
-      theme: themeProvider.currentTheme,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomePage(),
-        '/styleguide': (context) => const StyleGuide(),
-        '/camera': (context) => const CameraScreen(),
-      },
-      builder: (context, child) {
-        // Force apply theme to all child widgets
-        return Theme(
-          data: themeProvider.currentTheme,
-          child: child!,
-        );
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: Consumer2<ThemeProvider, LanguageProvider>(
+        builder: (context, themeProvider, languageProvider, child) {
+          return MaterialApp(
+            title: 'Travel App',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              brightness: themeProvider.isDarkMode ? Brightness.dark : Brightness.light,
+            ),
+            locale: languageProvider.currentLocale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('es'),
+            ],
+            home: const LoginPage(),
+          );
+        },
+      ),
     );
   }
 }
