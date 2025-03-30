@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/theme_provider.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
 
 class Search extends StatelessWidget {
   const Search({super.key});

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart' as app_auth;
-import 'package:untitled/screens/LoginPage.dart';
-import 'package:untitled/providers/theme_provider.dart';
+import 'package:bacoordinates/providers/auth_provider.dart' as app_auth;
+import 'package:bacoordinates/screens/LoginPage.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth hide AuthProvider;
-import 'package:untitled/providers/language_provider.dart';
-import 'package:untitled/localizations/app_localizations.dart';
+import 'package:bacoordinates/providers/language_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -26,6 +26,7 @@ class ProfilePage extends StatelessWidget {
   void _showEditProfileDialog(BuildContext context) {
     final user = context.read<app_auth.AuthProvider>().user;
     final usernameController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
     
     // Get current username
     _getUserName(user!.uid).then((username) {
@@ -37,22 +38,22 @@ class ProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Profile'),
+        title: Text(l10n.editProfile),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.username,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const TextField(
+            TextField(
               decoration: InputDecoration(
-                labelText: 'Bio',
-                border: OutlineInputBorder(),
+                labelText: l10n.bio,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -61,7 +62,7 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -73,7 +74,7 @@ class ProfilePage extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -84,37 +85,38 @@ class ProfilePage extends StatelessWidget {
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
+        title: Text(l10n.changePasswordTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: currentPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Current Password',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.currentPassword,
+                border: const OutlineInputBorder(),
               ),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: newPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'New Password',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.newPassword,
+                border: const OutlineInputBorder(),
               ),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: confirmPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Confirm New Password',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.confirmPassword,
+                border: const OutlineInputBorder(),
               ),
               obscureText: true,
             ),
@@ -123,13 +125,13 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
               if (newPasswordController.text != confirmPasswordController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('New passwords do not match')),
+                  SnackBar(content: Text(l10n.confirmPassword)),
                 );
                 return;
               }
@@ -137,14 +139,11 @@ class ProfilePage extends StatelessWidget {
               try {
                 final user = context.read<app_auth.AuthProvider>().user;
                 if (user != null) {
-                  // Reauthenticate user
                   final credential = firebase_auth.EmailAuthProvider.credential(
                     email: user.email!,
                     password: currentPasswordController.text,
                   );
                   await user.reauthenticateWithCredential(credential);
-                  
-                  // Update password
                   await user.updatePassword(newPasswordController.text);
                   if (context.mounted) {
                     Navigator.pop(context);
@@ -158,7 +157,7 @@ class ProfilePage extends StatelessWidget {
                 }
               }
             },
-            child: const Text('Change Password'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -166,23 +165,24 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showNotificationSettings(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Notification Settings'),
+        title: Text(l10n.notifications),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SwitchListTile(
-              title: const Text('Push Notifications'),
-              value: true, // Replace with actual state
+              title: Text(l10n.pushNotifications),
+              value: true,
               onChanged: (value) {
                 // Implement notification toggle
               },
             ),
             SwitchListTile(
-              title: const Text('Email Notifications'),
-              value: true, // Replace with actual state
+              title: Text(l10n.emailNotifications),
+              value: true,
               onChanged: (value) {
                 // Implement email notification toggle
               },
@@ -192,7 +192,7 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -200,25 +200,26 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showPrivacySettings(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Privacy Settings'),
+        title: Text(l10n.privacy),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SwitchListTile(
-              title: const Text('Profile Visibility'),
-              subtitle: const Text('Make your profile visible to other users'),
-              value: true, // Replace with actual state
+              title: Text(l10n.profileVisibility),
+              subtitle: Text(l10n.profileVisibility),
+              value: true,
               onChanged: (value) {
                 // Implement privacy toggle
               },
             ),
             SwitchListTile(
-              title: const Text('Activity Status'),
-              subtitle: const Text('Show when you\'re active'),
-              value: true, // Replace with actual state
+              title: Text(l10n.activityStatus),
+              subtitle: Text(l10n.activityStatus),
+              value: true,
               onChanged: (value) {
                 // Implement activity status toggle
               },
@@ -228,7 +229,7 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -237,13 +238,14 @@ class ProfilePage extends StatelessWidget {
 
   void _showLanguageSettings(BuildContext context) {
     final languageProvider = context.read<LanguageProvider>();
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.languageSettings),
+        title: Text(l10n.languageSettings),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: [ 
             ListTile(
               title: const Text('English'),
               leading: const Icon(Icons.language),
@@ -269,7 +271,7 @@ class ProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -277,25 +279,26 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showAboutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('About App'),
-        content: const Column(
+        title: Text(l10n.aboutApp),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text('Your travel companion app for creating and managing itineraries.'),
-            SizedBox(height: 8),
-            Text('© 2024 All rights reserved.'),
+            Text('${l10n.version}: 1.0.0'),
+            const SizedBox(height: 8),
+            Text(l10n.appDescription),
+            const SizedBox(height: 8),
+            const Text('© 2024 All rights reserved.'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -305,10 +308,11 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<app_auth.AuthProvider>().user;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(l10n.profile),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),

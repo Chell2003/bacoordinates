@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/theme_provider.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:untitled/components/DarkModeToggle.dart';
+import 'package:bacoordinates/components/DarkModeToggle.dart';
 
 class TranslatorPage extends StatefulWidget {
   const TranslatorPage({super.key});

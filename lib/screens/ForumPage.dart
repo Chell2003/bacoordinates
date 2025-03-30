@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
-import 'package:untitled/providers/theme_provider.dart';
+import 'package:bacoordinates/providers/auth_provider.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:untitled/screens/PostDetailPage.dart';
+import 'package:bacoordinates/screens/PostDetailPage.dart';
 
 import 'PostViewPage.dart';
 

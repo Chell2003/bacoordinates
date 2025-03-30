@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
+import 'package:bacoordinates/providers/auth_provider.dart';
 
 class ItineraryScreen extends StatefulWidget {
   const ItineraryScreen({super.key});

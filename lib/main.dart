@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/language_provider.dart';
-import 'package:untitled/providers/theme_provider.dart';
-import 'package:untitled/providers/auth_provider.dart';
-import 'package:untitled/screens/LoginPage.dart';
-import 'package:untitled/l10n/app_localizations.dart';
-import 'package:untitled/screens/HomePage.dart';
-import 'package:untitled/components/StyleGuide.dart';
-import 'package:untitled/screens/camera_screen.dart';
+import 'package:bacoordinates/providers/language_provider.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
+import 'package:bacoordinates/providers/auth_provider.dart';
+import 'package:bacoordinates/screens/LoginPage.dart';
+import 'package:bacoordinates/l10n/app_localizations.dart';
+import 'package:bacoordinates/screens/HomePage.dart';
+import 'package:bacoordinates/components/StyleGuide.dart';
+import 'package:bacoordinates/screens/camera_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

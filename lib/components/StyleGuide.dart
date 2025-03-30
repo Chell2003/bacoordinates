@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/providers/theme_provider.dart';
-import 'package:untitled/components/DarkModeToggle.dart';
+import 'package:bacoordinates/providers/theme_provider.dart';
+import 'package:bacoordinates/components/DarkModeToggle.dart';
 
 /// StyleGuide is a development tool to showcase the app's design system
 /// This component is not meant to be used in production
